@@ -231,9 +231,12 @@ func resourceRancherStackUpdate(d *schema.ResourceData, meta interface{}) error 
 	d.SetPartial("name")
 	d.SetPartial("description")
 	d.SetPartial("scope")
+        //When rancher-compose changes we need to delete and recreate stack due to rancher bug.
+	if d.HasChange("rancher_compose") {
+		resourceRancherStackDelete(d, meta)
+		resourceRancherStackCreate(d, meta)
 
-	if d.HasChange("docker_compose") ||
-		d.HasChange("rancher_compose") ||
+	} else if d.HasChange("docker_compose") ||
 		d.HasChange("environment") ||
 		d.HasChange("catalog_id") {
 
